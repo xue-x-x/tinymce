@@ -244,6 +244,26 @@
         </el-card>
         <el-card :body-style="{ padding: '20px' }" shadow="never">
           <div slot="header" class="clearfix center">
+            <span>添加视频</span>
+          </div>
+          <el-row>
+            <el-col>
+              <el-upload
+                ref="upload"
+                action=""
+                accept=".mp4,.qlv,.qsv,.ogg,.flv,.avi,.wmv,.rmvb"
+                :on-change="fileChange"
+                :auto-upload="false"
+              >
+                <el-button class="add-video" slot="trigger" size="small" type="primary">选取</el-button>
+                <el-button class="add-video" style="margin-left: 10px;" size="small" type="success" @click="upload">上传</el-button>
+              </el-upload>
+
+            </el-col>
+          </el-row>
+        </el-card>
+        <el-card :body-style="{ padding: '20px' }" shadow="never">
+          <div slot="header" class="clearfix center">
             <span>编辑完成</span>
           </div>
           <el-row>
@@ -252,6 +272,7 @@
             </el-col>
           </el-row>
         </el-card>
+
       </el-aside>
     </el-container>
   </div>
@@ -267,7 +288,6 @@
   import 'tinymce/plugins/codesample'
   import 'tinymce/plugins/image'
   import 'tinymce/plugins/imagetools'
-  import 'tinymce/plugins/media'
   import 'tinymce/plugins/table'
   import 'tinymce/plugins/lists'
   import 'tinymce/plugins/contextmenu'
@@ -310,11 +330,11 @@
       },
       plugins: {
         type: [String, Array],
-        default: 'code link codesample lists image imagetools media table textcolor contextmenu fullscreen lineheight letterspacing insertdatetime autosave paste autolink directionality preview searchreplace'
+        default: 'code link codesample lists image imagetools table textcolor contextmenu fullscreen lineheight letterspacing insertdatetime autosave paste autolink directionality preview searchreplace'
       },
       toolbar: {
         type: [String, Array],
-        default: 'undo redo code link codesample bullist numlist ists image media table insertdatetime fullscreen bold italic alignleft aligncenter alignright alignjustify outdent indent ltr rtl removeformat forecolor backcolor lineheight letterspacing | fontselect formatselect fontsizeselect'
+        default: 'undo redo code link codesample bullist numlist ists image table insertdatetime fullscreen bold italic alignleft aligncenter alignright alignjustify outdent indent ltr rtl removeformat forecolor backcolor lineheight letterspacing | fontselect formatselect fontsizeselect'
       },
       contentHeight:{
         type:Number
@@ -336,6 +356,8 @@
         importUrl: "",
         testUrl:'http://b.bestbpk.cn',
         url:'http://b.bestbpk.cn',
+
+        files:'',
 
         id:'',
         content: "",
@@ -467,63 +489,6 @@
 
              xhr.send(formData);
            },
-          file_picker_callback: function (callback, value, meta) {
-            /* Provide file and text for the link dialog */
-            if (meta.filetype === 'file') {
-              callback('https://www.google.com/logos/google.jpg', { text: 'My text' });
-            }
-
-            /* Provide image and alt text for the image dialog */
-            if (meta.filetype === 'image') {
-              callback('https://www.google.com/logos/google.jpg', { alt: 'My alt text' });
-            }
-
-            /* Provide alternative source and posted for the media dialog */
-            if (meta.filetype === 'media') {
-              callback('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
-            }
-          },
-          /*file_picker_callback: function(cb, value, meta) {
-            //当点击meidia图标上传时,判断meta.filetype == 'media'有必要，因为file_picker_callback是media(媒体)、image(图片)、file(文件)的共同入口
-            if (meta.filetype == 'media'){
-              //创建一个隐藏的type=file的文件选择input
-              let input = document.createElement('input');
-              input.setAttribute('type', 'file');
-              input.onchange = function(){
-                let file = this.files[0];//只选取第一个文件。如果要选取全部，后面注意做修改
-                let xhr, formData;
-                xhr = new XMLHttpRequest();
-                xhr.withCredentials = false;
-                xhr.open('POST', 'http://video.xinba.com:8085/db_upload');
-                xhr.upload.onprogress = function (e) {
-                  // 进度(e.loaded / e.total * 100)
-                };
-                xhr.onerror = function () {
-                  //根据自己的需要添加代码
-                  console.log(xhr.status);
-                  return;
-                };
-                xhr.onload = function () {
-                  let json;
-                  if (xhr.status < 200 || xhr.status >= 300) {
-                    console.log('HTTP 错误: ' + xhr.status);
-                    return;
-                  }
-                  json = xhr.responseText;
-                  cb('movie.mp4', { source2: 'alt.ogg', poster: 'https://www.google.com/logos/google.jpg' });
-//                  cb(json, {source2: 'alt.ogg', poster: 'image.jpg'});
-
-                };
-                formData = new FormData();
-                //假设接口接收参数为file,值为选中的文件
-                formData.append('upfile', file);
-                //正式使用将下面被注释的内容恢复
-                xhr.send(formData);
-              }
-              //触发点击
-              input.click();
-            }
-          },*/
           setup: function(editor) {
             // Tab 添加空格
             editor.on("keydown", function(event) {
@@ -602,6 +567,52 @@
       // activeEditor https://www.tiny.cloud/docs/api/tinymce/tinymce.editormanager/
       // http://www.iwms.net/n2065c17.aspx
 
+      //视频选取文件
+      fileChange(file){
+        this.files=file.raw;//上传文件变化时将文件对象push进files数组
+        console.log(this.files);
+      },
+      //视频上传服务器
+      upload(){
+        let _this=this;
+        let formData = new FormData();
+        formData.append('upfile',this.files);
+        let config = {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        };
+        _this.loadingService = this.$loading({
+          lock: true,
+          text: "视频上传中",
+          spinner: "el-icon-loading",
+          // background: "rgba(0, 0, 0, 0.7)",
+          target: document.querySelector("#editorAndAdvPanel")
+        });
+        this.axios.post('http://video.xinba.com:8085/db_upload',formData,config).then(res=>{
+          console.log(res.data);
+          _this.loadingService.close();
+          _this.addVideo(_this.addVideoHtml(res.data));
+        })
+      },
+      //添加视频标签
+      addVideoHtml(src) {
+        let html ="<p>\n" +
+          "               <span class=\"mce-preview-object mce-object-video\" contenteditable=\"false\" data-mce-object=\"video\" data-mce-p-allowfullscreen=\"allowfullscreen\" data-mce-p-frameborder=\"no\" data-mce-p-scrolling=\"no\" data-mce-p-src=${src} data-mce-html=\"%20\">\n" +
+          "                 <video src="+src+" width=\"100%\" controls=\"controls\"></video>\n" +
+          "               </span>\n" +
+          "            </p>\n";
+
+        return html;
+      },
+      //视频添加到编辑器
+      addVideo(newHtml) {
+        if (newHtml.indexOf("alert") == -1) {
+          //console.log("点击事件");
+          //console.log(newHtml);
+          this.$store.commit("SetNewHtml", newHtml);
+        }
+      },
       //可以添加一些自己的自定义事件，如清空内容
       editorChanged(e, editor) {
         if (tinymce.activeEditor != null) {
@@ -1566,6 +1577,10 @@
   }
   .el-form--label-left .el-form-item__content{
     width: 203px !important;
+  }
+  .add-video{
+    width: 100px;
+    font-size: 14px;
   }
   .el-main {
     padding: 0px !important;
