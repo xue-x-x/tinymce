@@ -1,0 +1,177 @@
+html, body, div, span,iframe,
+h1, h2, h3, h4, h5, h6, p,a,img,q,
+dl, dt, dd, ol, ul, li,form, label,
+table, caption, tbody, tfoot, thead, tr, th, td, canvas,
+ footer, header,  nav,  audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-style: inherit;
+    vertical-align: baseline;
+}
+*{
+    box-sizing: border-box;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+
+body {
+    line-height: 1;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+blockquote, q {
+    quotes: none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+html {
+    font-size: 62.5%;
+    color: #222;
+}
+
+::-moz-selection {
+    background-color: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background-color: #b3d4fc;
+    text-shadow: none;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+}
+
+input{
+    outline: none;
+}
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+img {
+    -ms-interpolation-mode: bicubic
+}
+/* ===============
+   自定义页面样式
+   =============== */
+body{
+    /*font:16px "Microsoft Yahei","SimSun","Arial",sans-serif;*/
+    font:16px 'Microsoft Yahei',Arial;
+    /*font:16px '\5B8B\4F53','Microsoft Yahei',Arial;*/
+    line-height: 1.5;
+    background-color: #ffffff;
+    position: relative;
+}
+a {
+    color: #666;
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    text-decoration: none;
+}
+/*公共类*/
+.fl {
+    float: left
+}
+.fr {
+    float: right
+}
+.al {
+    text-align: left
+}
+.ac {
+    text-align: center
+}
+.ar {
+    text-align: right
+}
+.hide {
+    display: none
+}
+.fs_14{font-size:14px;}
+.fs_16{font-size:16px}
+.fs_18{font-size:18px}
+.fs_20{font-size:20px}
+.fs_24{font-size:24px}
+.fs_26{font-size:26px}
+.fs_28{font-size:28px}
+.fs_30{font-size:30px}
+.fs_36{font-size:36px}
+.fs_40{font-size:40px}
+.fs_44{font-size:44px}
+.fs_50{font-size:50px}
+
+.wrap{margin: 0 auto;}
+.vh{
+    width: 100%;
+    height: 100vh;
+}
+.title{
+    padding: 20px 0;
+    text-align: center;
+    font-size: 28px;
+    line-height: 40px;
+    font-weight: 500;
+    color: #1A1A1A;
+}
+img{
+    display: block;
+    width: 100%;
+}
+@media screen and (max-width:1190px){
+  body{
+    /*width: 1200px;*/
+    width: 100%;
+  }
+  .wrap{ width: 1200px; }
+}
+@media screen and (min-width:1000px) {
+  .wrap{width: 970px;}
+}
+@media screen and (min-width: 1250px) {
+  .wrap{
+    width: 1200px;
+  }
+}
+@media screen and (max-width:1366px){
+
+}
+@media screen and (max-width:768px){
+  body{
+    width: 100%;
+  }
+  .wrap{
+    width: 100%;
+    /*padding: .2rem .2rem 0 .2rem !important;*/
+  }
+}
+
