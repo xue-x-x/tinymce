@@ -194,7 +194,7 @@
           { name: "情人节", tagName: "情人节/七夕" }
         ],
         allStyleIsVisible: false,
-        pageIndex: 0,
+        pageIndex: 1,
         pageEnd: false,
         pageLoading: false,
         currentTag: "编号标题",
@@ -231,7 +231,7 @@
 
         this.resetPage("编号标题", false);
 
-        this.loadStylePageData(0, "编号标题");
+        this.loadStylePageData(1, "编号标题");
       },
       searchStyle() {
         //console.log(this.searchTagTxt);
@@ -241,13 +241,13 @@
 
           this.searching = true;
 
-          this.loadStylePageData(0, this.searchTagTxt);
+          this.loadStylePageData(1, this.searchTagTxt);
         }
       },
       resetPage(tag, isSearching) {
         this.pageEnd = false;
         this.styleData = [];
-        this.pageIndex = 0;
+        this.pageIndex = 1;
 
         if (isSearching == false) {
           this.searching = false;
@@ -309,8 +309,8 @@
         //}
       },
       loadStylePageData(page, tag) {
-        var _this = this;
-
+        let _this = this;
+        let styleData=_this.styleData;
         //console.log(this.pageLoading);
 
         this.pageLoading = true;
@@ -326,22 +326,19 @@
           .get(apiUrl)
           .then(response => {
 //            console.log(response.data);
-
-            //ToDo: 这给地方判断结束有问题
-            //不能用 < 10，因为可能正好等于10
-            //需要修改为API返回值判断
-            if (response.data.data.list.length < 10) {
-              this.pageEnd = true;
-            } else {
-              this.pageEnd = false;
+            let data=response.data;
+            styleData=styleData.concat(data.data.list);
+            if(data.status == 1){
+              if (styleData.length == data.data.totalCount) {
+                this.pageEnd = true;
+              } else {
+                this.pageEnd = false;
+              }
+              _this.pageLoading = false;
+              this.loadMorePageData(data.data.list);
+            }else {
+              this.$message.error(data.message);
             }
-            // setTimeout(function() {
-            //   _this.pageLoading = false;
-            // }, 200);
-
-            _this.pageLoading = false;
-
-            this.loadMorePageData(response.data.data.list);
           })
           .catch(error => {
             console.log(error);
@@ -412,7 +409,7 @@
 
         this.resetPage(tag, false);
 
-        this.loadStylePageData(0, tag);
+        this.loadStylePageData(1, tag);
       },
       getTitleListAPI() {
         if (process.env.NODE_ENV === "development") {
@@ -476,7 +473,7 @@
     created() {
       this.resetPage("编号标题", false);
 
-      this.loadStylePageData(0, "编号标题");
+      this.loadStylePageData(1, "编号标题");
     },
     computed: {
       tableHeight() {

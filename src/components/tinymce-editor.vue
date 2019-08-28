@@ -400,15 +400,8 @@
 
           custom_undo_redo_levels: 60,
           end_container_on_empty_block: true,
-          imagetools_proxy: 'http://192.168.1.197/task/tesk/proxy.php',//跨域获取图像
-          imagetools_cors_hosts: ["image.yzmg.com", "b.bestbpk.cn"],
-          /* images_upload_url: 'http://video.xinba.com:8085/db_upload',//图片提交地址
-           images_upload_base_path: '',//图片路径
-           images_reuse_filename: true,
-           end_container_on_empty_block: true,
-           imagetools_proxy: 'http://192.168.1.197/task/tesk/proxy.php',//跨域获取图像
-           automatic_uploads: true, //https://www.tiny.cloud/docs/configure/file-image-upload/#automatic_uploads
-           imagetools_cors_hosts: ["", ""],//图片域名*/
+//          imagetools_proxy: 'http://192.168.1.197/task/tesk/proxy.php',//跨域获取图像
+//          imagetools_cors_hosts: ["image.yzmg.com", "b.bestbpk.cn"],
           autosave_restore_when_empty: false,
 
           fontsize_formats: "10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 24px 28px 32px 36px",
@@ -584,7 +577,7 @@
         };
         _this.loadingService = this.$loading({
           lock: true,
-          text: "视频上传中",
+          text: "视频上传中,请稍后！",
           spinner: "el-icon-loading",
           // background: "rgba(0, 0, 0, 0.7)",
           target: document.querySelector("#editorAndAdvPanel")

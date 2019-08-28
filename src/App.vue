@@ -2,10 +2,10 @@
   <div id="app">
     <headerV></headerV>
     <el-container class="content-box">
-      <el-aside style="width: 25%">
+      <el-aside class="aside-left">
         <router-view name="style" :contentHeight="contentHeight"></router-view>
       </el-aside>
-      <el-aside  style="width: 75%" :height="tinymceHeight">
+      <el-aside class="aside-right" :height="tinymceHeight">
         <router-view v-model="msg"
                      :disabled="disabled"
                      @onClick="onClick"
@@ -69,7 +69,19 @@ export default {
   /*text-align: center;*/
   /*color: #2c3e50;*/
 /*}*/
-.content-box{
-  margin-top: 10px;
-}
+  .content-box{
+    position: relative;
+    margin-top: 10px;
+    padding-left: 386px;
+    width: 100%;
+  }
+  .aside-left{
+    position: absolute;
+    left: 0;
+    z-index: 20;
+    width: 386px !important;
+  }
+  .aside-right{
+    width: 100% !important;
+  }
 </style>
