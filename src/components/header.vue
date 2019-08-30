@@ -17,12 +17,6 @@
             <li><a :href="urlList.article_list">文章编辑器</a></li>
           </ul>
         </nav>
-        <nav class="nav">
-          <ul class="register-ul">
-            <li class="login-nav"><a :href="urlList.login">登录</a></li>
-            <li class="register-nav"><a :href="urlList.register">注册</a></li>
-          </ul>
-        </nav>
       </div>
     </div>
   </header>
@@ -34,11 +28,17 @@
     data() {
       return {
         url:'http://b.bestbpk.cn',
-        urlList:{}
+        urlList:{
+          original:'/inspection/original',
+          profanity:'/inspection/profanity',
+          article_list:'/inspection/article_list',
+          login:'/inspection/login',
+          register:'/inspection/register',
+        }
       }
     },
     mounted() {
-      this.url=location.host;
+/*      this.url=location.host;
       this.urlList={
         original:this.url+'/inspection/original',
         profanity:this.url+'/inspection/profanity',
@@ -46,8 +46,7 @@
         login:this.url+'/inspection/login',
         register:this.url+'/inspection/register',
 
-      }
-
+      }*/
     },
     methods: {
 

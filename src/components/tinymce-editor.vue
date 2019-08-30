@@ -73,14 +73,6 @@
                 @click="moveDown"
               >下移</el-button>
             </el-col>
-            <el-col :span="3">
-              <el-button
-                type="text"
-                class="button"
-                @click="convertItemToImage"
-                :disabled="disableSelectedItemPanel"
-              >转图片</el-button>
-            </el-col>
           </el-row>
           <el-row :gutter="50">
             <el-col :span="3">
@@ -228,16 +220,12 @@
           <el-row>
             <el-col>
               <div>
-                <el-button type="text">生成长图(宽480px)</el-button>
+                <el-button type="text" @click="saveArticle('wap')">生成长图(适配 WAP)</el-button>
                 <!--<el-button type="text" @click="genLongImage(480)">生成长图(宽480px)</el-button>-->
               </div>
               <div>
-                <el-button type="text">生成长图(宽640px)</el-button>
+                <el-button type="text" @click="saveArticle('pc')">生成长图(适配 PC)</el-button>
                 <!--<el-button type="text" @click="genLongImage(640)">生成长图(宽640px)</el-button>-->
-              </div>
-              <div>
-                <el-button type="text">生成长图(宽1024px)</el-button>
-                <!--<el-button type="text" @click="genLongImage(1024)">生成长图(宽1024px)</el-button>-->
               </div>
             </el-col>
           </el-row>
@@ -272,9 +260,19 @@
             </el-col>
           </el-row>
         </el-card>
-
       </el-aside>
     </el-container>
+    <div class="pop" v-if="ispopUp">
+      <div class="pop-box">
+        <div class="closeBtn" @click="close">
+          <img src="../assets/closeBtn.png" alt="">
+        </div>
+        <div class="pop-content">
+          <img :src="popSrc" alt="">
+        </div>
+      </div>
+
+    </div>
   </div>
 </template>
 
@@ -303,6 +301,7 @@
   import 'tinymce/plugins/directionality'//文字方向 ltr文字方向从左到右，rtl从右到左
   import 'tinymce/plugins/preview'//内容浏览
   import 'tinymce/plugins/searchreplace'//查找替换
+  import 'tinymce/plugins/preview'//预览
   /*  import tinymceEditor from "@tinymce/tinymce-vue";
 
     import crypto from "crypto";*/
@@ -330,11 +329,11 @@
       },
       plugins: {
         type: [String, Array],
-        default: 'code link codesample lists image imagetools table textcolor contextmenu fullscreen lineheight letterspacing insertdatetime autosave paste autolink directionality preview searchreplace'
+        default: 'code link codesample lists image imagetools table textcolor contextmenu fullscreen lineheight letterspacing insertdatetime autosave paste autolink directionality preview searchreplace preview'
       },
       toolbar: {
         type: [String, Array],
-        default: 'undo redo code link codesample bullist numlist ists image table insertdatetime fullscreen bold italic alignleft aligncenter alignright alignjustify outdent indent ltr rtl removeformat forecolor backcolor lineheight letterspacing | fontselect formatselect fontsizeselect'
+        default: 'undo redo code link codesample bullist numlist ists image table insertdatetime fullscreen bold italic alignleft aligncenter alignright alignjustify outdent indent ltr rtl removeformat forecolor backcolor lineheight letterspacing preview | fontselect formatselect fontsizeselect '
       },
       contentHeight:{
         type:Number
@@ -362,6 +361,8 @@
         id:'',
         content: "",
         myValue: '',
+        ispopUp:false,
+        popSrc:'',
         //初始化配置
         init: {
           language_url: '/static/tinymce/zh_CN.js',
@@ -590,8 +591,8 @@
       },
       //添加视频标签
       addVideoHtml(src) {
-        let html ="<p>\n" +
-          "               <span class=\"mce-preview-object mce-object-video\" contenteditable=\"false\" data-mce-object=\"video\" data-mce-p-allowfullscreen=\"allowfullscreen\" data-mce-p-frameborder=\"no\" data-mce-p-scrolling=\"no\" data-mce-p-src=${src} data-mce-html=\"%20\">\n" +
+        let html ="<p style='width: 90%;margin: 0 auto'>\n" +
+          "               <span class=\"mce-preview-object mce-object-video\" contenteditable=\"false\" data-mce-object=\"video\" data-mce-p-allowfullscreen=\"allowfullscreen\" data-mce-p-frameborder=\"no\" data-mce-p-scrolling=\"no\" data-mce-p-src="+src+" data-mce-html=\"%20\">\n" +
           "                 <video src="+src+" width=\"100%\" controls=\"controls\"></video>\n" +
           "               </span>\n" +
           "            </p>\n";
@@ -1180,11 +1181,12 @@
           return this.url+"/inspection/request_public?url=" + escape(url);
         }
       },
-      getGenImageAPI() {
+      getGenImageAPI(os) {
+        let num=Math.random();
         if (process.env.NODE_ENV === "development") {
-          return "https://192.168.1.202:8181";
+          return this.testUrl+"/inspection/get_wap_or_pc_img?id="+this.id+"&os="+os+"&t="+num;
         } else {
-          return "https://ai.5118.com:8181";
+          return this.url+"/inspection/get_wap_or_pc_img?id="+this.id+"&os="+os+"&t="+num;
         }
       },
       getArticleAPI() {
@@ -1201,9 +1203,14 @@
           return "https://ai.5118.com";
         }
       },
-      genLongImage(imageWidth) {
+      close(){
+        this.ispopUp=false;
+      },
+      genLongImage(os) {
+        let _this=this;
+        let src=_this.getGenImageAPI(os);
+        console.log();
         this.deactiveItem(this.getEditorDoc());
-
         this.loadingService = this.$loading({
           lock: true,
           text: "正在生成长图，请耐心等待",
@@ -1211,128 +1218,13 @@
           // background: "rgba(0, 0, 0, 0.7)",
           target: document.querySelector("#editorAndAdvPanel")
         });
-
-        var bodyHtml =
-          '<!DOCTYPE html><html><head><title>test</title><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta http-equiv="content-type" content="text/html;charset=utf-8"><link rel="stylesheet" type="text/css" href="https://' +
-          host +
-          '/static/tinymce/editor.css"></head><body>' +
-          tinymce.activeEditor.getContent({ format: "raw" }) +
-          "</body></html>";
-        //console.log(bodyHtml);
-        var md5 = crypto.createHash("md5");
-        md5.update(bodyHtml);
-        var bodyHtmlHash = md5.digest("hex");
-        var imageHost = this.getImageHost();
-        //console.log(bodyHtmlHash);
-
-        var headers = {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-          }
-        };
-
-        // var params = new URLSearchParams();
-        // params.append("html", escape(bodyHtml));
-        // params.append("hash", escape(bodyHtmlHash));
-        var params = JSON.stringify({
-          html: escape(bodyHtml),
-          hash: escape(bodyHtmlHash),
-          imageHost: escape(imageHost),
-          imageWidth: escape(imageWidth)
-        });
-
-        this.axios
-        //.get(this.getGenImageAPI(this.importUrl))
-          .post(this.getGenImageAPI(), params, headers)
-          .then(response => {
-            //console.log(response.data);
-            //tinymce.activeEditor.setContent(response.data);
-
-            this.loadingService.close();
-
-            this.$alert(
-              '<div class="genLongImgDownLink"><a href="' +
-              response.data +
-              '" target="_blank">点此链接下载长图</a></div><div class="genLongImgPreviewImg"><img class="genLongPreviewImg" src="' +
-              response.data +
-              '" ></div>',
-              "长图下载",
-              {
-                dangerouslyUseHTMLString: true,
-                showClose: false,
-                confirmButtonText: "关闭",
-                lockScroll: true,
-                customClass: "genLongImg"
-              }
-            );
-          })
-          .catch(error => {
-            this.loadingService.close();
-
-            console.log(error);
-            this.$message.error("文章生成长图时发生错误: " + error);
-          });
-      },
-      convertItemToImage() {
-        this.deactiveItem(this.getEditorDoc());
-
-        this.loadingService = this.$loading({
-          lock: true,
-          text: "正在将样式转换成图片，请耐心等待",
-          spinner: "el-icon-loading",
-          // background: "rgba(0, 0, 0, 0.7)",
-          target: document.querySelector("#editorAndAdvPanel")
-        });
-
-        var styleItemParent = this.selectedStyleItemParent;
-
-        var bodyHtml =
-          '<!DOCTYPE html><html><head><title>test</title><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta http-equiv="content-type" content="text/html;charset=utf-8"><link rel="stylesheet" type="text/css" href="https://' +
-          host +
-          '/static/tinymce/editor.css"></head><body>' +
-          styleItemParent.innerHTML +
-          "</body></html>";
-        //console.log(bodyHtml);
-        var md5 = crypto.createHash("md5");
-        md5.update(bodyHtml);
-        var bodyHtmlHash = md5.digest("hex");
-        var imageHost = this.getImageHost();
-        //console.log(bodyHtmlHash);
-
-        var headers = {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-          }
-        };
-
-        // var params = new URLSearchParams();
-        // params.append("html", escape(bodyHtml));
-        // params.append("hash", escape(bodyHtmlHash));
-        var params = JSON.stringify({
-          html: escape(bodyHtml),
-          hash: escape(bodyHtmlHash),
-          imageHost: escape(imageHost)
-        });
-
-        this.axios
-        //.get(this.getGenImageAPI(this.importUrl))
-          .post(this.getGenImageAPI(), params, headers)
-          .then(response => {
-            //console.log(response.data);
-            //tinymce.activeEditor.setContent(response.data);
-
-            this.loadingService.close();
-
-            styleItemParent.innerHTML = '<img src="' + response.data + '">';
-
-            this.setDirty();
-          })
-          .catch(error => {
-            this.loadingService.close();
-
-            console.log(error);
-            this.$message.error("样式生成图片发生错误: " + error);
-          });
+        let newImg = new Image();
+        newImg.src = src;
+        newImg.onload = function(){
+          _this.loadingService.close();
+          _this.ispopUp=true;
+          _this.popSrc=src;
+        }
       },
       getEditorDoc() {
         //console.log(tinymce.activeEditor.getDoc());
@@ -1363,22 +1255,26 @@
 //          tinymce.activeEditor.theme.resizeTo("100%", realHeight);
         }
       },
-      saveArticle() {
+      saveArticle(os) {
         const _this=this;
         let content=tinymce.activeEditor.getBody().innerHTML;
         let id=_this.id;
-
         this.axios
           .post(this.getArticleAPI(),{
             id: id,
             content: content
           })
           .then(response => {
-            console.log(response);
-            _this.$notify({
-              title: "保存成功",
-              type: "success"
-            });
+            if((os == 'wap' || os == 'pc') && response.data.status == 1){
+              _this.genLongImage(os);
+              return;
+            }
+            if(response.data.status == 1){
+              _this.$notify({
+                title: "保存成功",
+                type: "success"
+              });
+            }
           })
           .catch(error => {
             console.log(error);
@@ -1507,20 +1403,11 @@
       insertCount: {
         //deep: true,
         handler: function() {
-          //console.log("给编辑器赋值");
-          //console.log(this.insertHtml);
           var newHtml =
-            //margin: 0px auto; width: 100%; 让样式居中
             "<section class='parentStyle' style='margin: 0px auto; width: 100%;'><p style='display: block;'/>" +
             this.insertHtml +
             "<p style='display: block;'/></section><br />&nbsp;";
-
-          //console.log(newHtml);
-
           this.deactiveItem(this.getEditorDoc());
-
-          //tinymce.activeEditor.execCommand("mceInsertContent", false, newHtml);
-
           tinymce.activeEditor.insertContent(newHtml);
 
           this.$notify({
@@ -1574,6 +1461,39 @@
   .add-video{
     width: 100px;
     font-size: 14px;
+  }
+  /*弹窗*/
+  .pop{
+    position: fixed;
+    top:0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: flex;
+    align-items:center;
+  }
+  .pop-box{
+    position: relative;
+    margin: 0 auto;
+    height: 80%;
+  }
+  .pop-content{
+    width: 500px;
+    height: 100%;
+    overflow: auto;
+    background-color: #fff;
+  }
+  .pop-box img{
+    width: 100%;
+  }
+  .closeBtn{
+    position: absolute;
+    right: -100px;
+    top: -40px;
+    width: 30px;
+    height: 30px;
   }
   .el-main {
     padding: 0px !important;
