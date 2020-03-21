@@ -334,8 +334,8 @@
         color4: "#409EFF",
 
         importUrl: "",
-        testUrl:'http://b.bestbpk.cn',
-        url:'http://b.bestbpk.cn',
+        testUrl:'http://tools.xinba.com',
+        url:'http://tools.xinba.com',
 
         id:this.$route.query.id,
         content: "",
@@ -1967,8 +1967,8 @@
         color4: "#409EFF",
 
         importUrl: "",
-        testUrl:'http://b.bestbpk.cn',
-        url:'http://b.bestbpk.cn',
+        testUrl:'http://tools.xinba.com',
+        url:'http://tools.xinba.com',
 
         id:this.$route.query.id,
         content: "",

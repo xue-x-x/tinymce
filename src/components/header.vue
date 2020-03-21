@@ -27,7 +27,7 @@
   export default {
     data() {
       return {
-        url:'http://b.bestbpk.cn',
+        url:'http://tools.xinba.com',
         urlList:{
           original:'/inspection/original',
           profanity:'/inspection/profanity',

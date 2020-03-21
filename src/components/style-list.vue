@@ -206,8 +206,8 @@
         hotTags: [
 
         ],
-        testUrl:'http://b.bestbpk.cn',
-        url:'http://b.bestbpk.cn',
+        testUrl:'http://tools.xinba.com',
+        url:'http://tools.xinba.com',
         titleList:[
           {type:'标题'},
           {type:'正文'},
@@ -225,6 +225,13 @@
       contentHeight:Number
     },
     methods: {
+      getScroll(event){
+        let scrollBottom =
+          event.target.scrollHeight -
+          event.target.scrollTop -
+          event.target.clientHeight;
+        console.log(scrollBottom);
+      },
       alertClose() {
         this.searchTagTxt = "";
         this.searching = false;
@@ -235,12 +242,9 @@
       },
       searchStyle() {
         //console.log(this.searchTagTxt);
-
         if (this.searchTagTxt != "") {
           this.resetPage(this.searchTagTxt, true);
-
           this.searching = true;
-
           this.loadStylePageData(1, this.searchTagTxt);
         }
       },
@@ -301,12 +305,10 @@
         return html;
       },
       loadMore() {
-        //if (this.pageEnd == false) {
+        if (this.pageEnd == false) {
         this.pageIndex++;
-        //console.log(this.pageIndex);
-
         this.loadStylePageData(this.pageIndex, this.currentTag);
-        //}
+        }
       },
       loadStylePageData(page, tag) {
         let _this = this;
@@ -321,14 +323,12 @@
           apiUrl = this.searchStyleAPI(page, tag);
           message = "搜索样式列表时网络异常";
         }
-
         this.axios
           .get(apiUrl)
           .then(response => {
-//            console.log(response.data);
             let data=response.data;
-            styleData=styleData.concat(data.data.list);
             if(data.status == 1){
+              styleData=styleData.concat(data.data.list);
               if (styleData.length == data.data.totalCount) {
                 this.pageEnd = true;
               } else {
@@ -336,7 +336,7 @@
               }
               _this.pageLoading = false;
               this.loadMorePageData(data.data.list);
-            }else {
+            }else if(!data.status){
               this.$message.error(data.message);
             }
           })
@@ -456,8 +456,7 @@
           const selectWrap = el.querySelector(".el-table__body-wrapper");
 
           selectWrap.addEventListener("scroll", function() {
-            let sign = 500;
-
+            let sign = 0;
             const scrollDistance =
               this.scrollHeight - this.scrollTop - this.clientHeight;
             if (scrollDistance <= sign) {

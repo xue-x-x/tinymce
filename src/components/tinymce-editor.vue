@@ -270,8 +270,10 @@
         <div class="pop-content">
           <img :src="popSrc" alt="">
         </div>
+        <div class="download-img" @click="downs">
+          图片下载
+        </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -351,13 +353,10 @@
         alpha: 1,
         disableSelectedItemPanel: true,
         color4: "#409EFF",
-
         importUrl: "",
-        testUrl:'http://b.bestbpk.cn',
-        url:'http://b.bestbpk.cn',
-
+        testUrl:'http://tools.xinba.com',
+        url:'http://tools.xinba.com',
         files:'',
-
         id:'',
         content: "",
         myValue: '',
@@ -655,6 +654,9 @@
             console.log(error);
           });
 
+      },
+      downs() {
+        location.href=this.popSrc;
       },
       onClickItem() {
         //console.log("test");1
@@ -1478,10 +1480,11 @@
     position: relative;
     margin: 0 auto;
     height: 80%;
+    background-color: #fff;
   }
   .pop-content{
     width: 500px;
-    height: 100%;
+    height: calc(100% - 30px - 20px);
     overflow: auto;
     background-color: #fff;
   }
@@ -1494,6 +1497,18 @@
     top: -40px;
     width: 30px;
     height: 30px;
+  }
+  .download-img{
+    margin: 10px auto;
+    width: 120px;
+    height: 30px;
+    line-height: 30px;
+    background-color: #338cff;
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+    border-radius:5px;
+    cursor: pointer;
   }
   .el-main {
     padding: 0px !important;
